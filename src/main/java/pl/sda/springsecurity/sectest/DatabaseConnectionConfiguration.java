@@ -1,5 +1,8 @@
 package pl.sda.springsecurity.sectest;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,17 +14,13 @@ import java.net.URISyntaxException;
 @Configuration
 public class DatabaseConnectionConfiguration {
 
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
     @Bean
-    public DataSource dataSource() throws URISyntaxException {
-        URI dbUri = new URI(System.getenv("DATABASE_URL"));
-        String username = dbUri.getUserInfo().split(":")[0];
-        String password = dbUri.getUserInfo().split(":")[1];
-        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
-        return DataSourceBuilder.create()
-                .username(username)
-                .password(password)
-                .url(dbUrl)
-                .driverClassName("org.postgresql.Driver")
-                .build();
+    public DataSource dataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(dbUrl);
+        return new HikariDataSource(config);
     }
 }
