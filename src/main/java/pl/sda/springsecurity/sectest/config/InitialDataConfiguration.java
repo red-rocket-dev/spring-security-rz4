@@ -21,11 +21,13 @@ public class InitialDataConfiguration {
     @Bean
     public CommandLineRunner commandLineRunner() {
         return (args -> {
-            System.out.println("HELLO WORLD");
-            UserEntity user = new UserEntity();
-            user.setLogin("myLogin");
-            user.setPassword(passwordEncoder.encode("password"));
-            userRepository.save(user);
+            if (userRepository.findByLogin("myLogin") == null) {
+                System.out.println("HELLO WORLD");
+                UserEntity user = new UserEntity();
+                user.setLogin("myLogin");
+                user.setPassword(passwordEncoder.encode("password"));
+                userRepository.save(user);
+            }
         });
     }
 }
